@@ -1,0 +1,6 @@
+C:\Users\sam_n\source\repos\driver\driver\bin\Release\driver.exe.config
+C:\Users\sam_n\source\repos\driver\driver\bin\Release\driver.exe
+C:\Users\sam_n\source\repos\driver\driver\bin\Release\driver.pdb
+C:\Users\sam_n\source\repos\driver\driver\obj\Release\driver.csproj.CoreCompileInputs.cache
+C:\Users\sam_n\source\repos\driver\driver\obj\Release\driver.exe
+C:\Users\sam_n\source\repos\driver\driver\obj\Release\driver.pdb
