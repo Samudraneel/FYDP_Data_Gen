@@ -35,12 +35,6 @@ def to_rad(x):
     return (3.14159265 / 180) * x
 
 def to_deg(x, prev):
-    # if x < 0:
-    #     return 180/math.pi * x + 360
-
-    # if 360*0.92 < abs(x - prev) < 360*1.08:
-    #     return 180/math.pi * (x % 360)
-
     if 2*math.pi*0.9 < x - prev < 2*math.pi*1.1:
         return 180/math.pi * (x - 2*math.pi)
     elif 2*math.pi*0.9 < prev - x < 2*math.pi*1.1:
@@ -78,9 +72,6 @@ class Driver():
                 (delim, finger, knuckle, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, xMag, yMag, zMag) = struct.unpack(fmt, newData[offset:offset+22])
                 bytes_remaining -= 22;
                 offset += 22
-
-                # multiply each value that was read by its scaling factor
-                # raw = (tuple(a * b for a,b in zip((xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, xMag, yMag, zMag), sens)))
 
                 print(finger, knuckle)
 
@@ -146,33 +137,6 @@ class Driver():
 
                 knuckle_idx += 1
             finger_idx += 1
-
-        # print("Preparing for magnetometer calibration. Start moving IMU slowly in figure 8's to cover a sphere.")
-        # time.sleep(2)
-        # print("Performing magnetometer calibration")
-        # data = self.continuousRead(15)
-
-        # finger_idx = 0
-        # for finger in data:
-        #     knuckle_idx = 0
-        #     for knuckle in finger:
-        #         if len(knuckle) > 0:
-        #             allXMag = [d[6] for d in knuckle]
-        #             allYMag = [d[7] for d in knuckle]
-        #             allZMag = [d[8] for d in knuckle]
-
-        #             self.xMagOffsets[finger_idx][knuckle_idx] = (max(allXMag) + min(allXMag))/2
-        #             self.yMagOffsets[finger_idx][knuckle_idx] = (max(allYMag) + min(allYMag))/2
-        #             self.zMagOffsets[finger_idx][knuckle_idx] = (max(allZMag) + min(allZMag))/2
-
-        #         knuckle_idx += 1
-        #     finger_idx += 1
-
-        # offsets = (self.xAccOffsets, self.yAccOffsets, self.zAccOffsets,
-        #     self.xGyroOffsets, self.yGyroOffsets, self.zGyroOffsets,
-        #     self.xMagOffsets, self.yMagOffsets, self.zMagOffsets)
-        # print("offsets:")
-        # print(offsets)
 
         print("Done calibrating. Put the device back down.")
         time.sleep(2)
@@ -255,24 +219,6 @@ if __name__ == "__main__":
     roll = []
     yaw = []
     for i in range(0, len(data)):
-        # for j in range(10):
-        # madgwick.update(
-        #     [to_rad(allxGyro[i]), to_rad(allyGyro[i]), to_rad(allzGyro[i])],
-        #     [allxAcc[i], allYAcc[i], allZacc[i]],
-        #     data[6:9])
-
-        # madgwick.update_imu(
-        #     [to_rad(allxGyro[i]), to_rad(allyGyro[i]), to_rad(allzGyro[i])],
-        #     [allxAcc[i], allYAcc[i], allZacc[i]])
-
-        # (r, p, y) = madgwick.quaternion.to_euler123()
-        # (r, p, y) = madgwick.quaternion.to_euler_angles()
-        # xAcc = sum(allxAcc[i:i+10])/10
-        # yAcc = sum(allYAcc[i:i+10])/10
-        # zAcc = sum(allZacc[i:i+10])/10
-        # xMag = sum(allXMag[i:i+10])/10
-        # yMag = sum(allYMag[i:i+10])/10
-        # zMag = sum(allZMag[i:i+10])/10
 
         xAcc = allxAcc[i]
         yAcc = allYAcc[i]
@@ -302,52 +248,6 @@ if __name__ == "__main__":
             pitch[-1] = lpf(pitch[-1], pitch[-2])
             roll[-1] = lpf(roll[-1], roll[-2])
             yaw[-1] = lpf(yaw[-1], yaw[-2])
-
-
-    # # get pitch roll and yaw of filtered data with madgwick filter converted from C
-    # pitch = []
-    # roll = []
-    # yaw = []
-    # for i in range(len(data)):
-    #     for j in range(10):
-    #         madgwick.MadgwickQuaternionUpdate(
-    #             filteredXAcc[i], filteredYAcc[i], filteredZAcc[i],
-    #             to_rad(filteredXGyro[i]), to_rad(filteredYGyro[i]), to_rad(filteredZGyro[i]),
-    #             data[i][6], data[i][7], data[i][8],
-    #             0.004
-    #         )
-    #     quat = Q.Quaternion(*(madgwick.q))
-    #     (r, p, y) = quat.to_euler_angles()
-    #     pitch.append(180/math.pi * p)
-    #     roll.append(180/math.pi * r)
-    #     yaw.append(180/math.pi * y)
-
-    # # get pitch roll and yaw from acceleration and magnetic field
-    # # taken from https://engineering.stackexchange.com/questions/3348/calculating-pitch-yaw-and-roll-from-mag-acc-and-gyro-data
-    # pitch = []
-    # roll = []
-    # yaw = []
-
-    # for i in range(len(data)):
-    #     p = 180 * math.atan2(filteredXAcc[i], math.sqrt(filteredYAcc[i]*filteredYAcc[i] + filteredZAcc[i]*filteredZAcc[i]))
-    #     r = 180 * math.atan2(filteredYAcc[i], math.sqrt(filteredXAcc[i]*filteredXAcc[i] + filteredZAcc[i]*filteredZAcc[i]))
-    #     y = 180 * math.atan2(filteredZAcc[i], math.sqrt(filteredXAcc[i]*filteredXAcc[i] + filteredZAcc[i]*filteredZAcc[i]))
-
-    #     pitch.append(p)
-    #     roll.append(r)
-    #     yaw.append(y)
-
-    # # low pass filter the pitch roll and yaw
-    # order = 6
-    # fs = 25       # sample rate, Hz
-    # cutoff = 1    # desired cutoff frequency of the filter, Hz
-
-    # # Get the filter coefficients so we can check its frequency response.
-    # b, a = butter_lowpass(cutoff, fs, order)
-
-    # pitch = butter_lowpass_filter(pitch, cutoff, fs, order)
-    # roll = butter_lowpass_filter(roll, cutoff, fs, order)
-    # yaw = butter_lowpass_filter(yaw, cutoff, fs, order)
 
     # plot pitch roll and yaw
     plt.figure(4)
